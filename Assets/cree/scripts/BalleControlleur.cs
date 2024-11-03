@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -41,12 +43,28 @@ public class BalleController : MonoBehaviour
     [SerializeField]
     private UnityEvent<float> afficherPoint;
 
+    public static int longueurMap { private set; get; }
+
+    private float currentTrou;
+    [SerializeField]
+    private TextMeshProUGUI trou1C;
+    [SerializeField]
+    private TextMeshProUGUI trou2C;
+    [SerializeField]
+    private TextMeshProUGUI trou3C;
+    [SerializeField]
+    private TextMeshProUGUI trou4C;
+
+    private bool mapFini = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         afficherPoint.Invoke(coups);
-        balleRB = GetComponent<Rigidbody>();
+        balleRB = gameObject.GetComponent<Rigidbody>();
         directionInitiale = transform.forward;
+        longueurMap = 5;
+        currentTrou = 0;
     }
 
     private void CoupJouer()
@@ -63,9 +81,18 @@ public class BalleController : MonoBehaviour
         afficherPoint.Invoke(coups);
     }
 
-    public void ResetPartie()
+    public void ResetPartie() //je ne fait pas le respawn de la balle ici car unity se fache pis je suis tanné de chercher
     {
+        currentTrou++;
+        mapFini = true;
+        coups = 20;
+        longueurMap++;
+        gameObject.transform.position = new Vector3(0, 1, -1);
+    }
 
+    public void Respawn()
+    {
+        gameObject.transform.position = new Vector3(0, 1, -1);
     }
 
     //code emprunté à Alex le prof (je crois, à vérifier. dans le doute, je dit que c'est emprunté)
@@ -145,6 +172,26 @@ public class BalleController : MonoBehaviour
         balleRB.rotation = balleRB.rotation *
             Quaternion.AngleAxis(rotation * vitesseRotation * Time.deltaTime, Vector3.up);
 
-            //Debug.Log(pousserBalle);
+        if (mapFini)
+        {
+            switch (currentTrou)
+            {
+                case 0:
+                    break;
+                case 1:
+                    trou1C.SetText(coups.ToString());
+                    break;
+                case 2:
+                    trou2C.SetText(coups.ToString());
+                    break;
+                case 3:
+                    trou3C.SetText(coups.ToString());
+                    break;
+                case 4:
+                    trou4C.SetText(coups.ToString());
+                    break;
+            }
+            mapFini = false;
+        }
     }
 }

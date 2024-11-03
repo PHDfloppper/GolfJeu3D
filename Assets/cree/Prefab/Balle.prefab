@@ -167,7 +167,7 @@ Transform:
   m_GameObject: {fileID: 8675287159464059189}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0.84, z: -1.19}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -266,6 +266,11 @@ MonoBehaviour:
   fleche: {fileID: 891181158537344046}
   jauge: {fileID: 0}
   rapiditeJauge: 25
+  coups: 20
+  afficherPoint:
+    m_PersistentCalls:
+      m_Calls: []
+  posRespawn: {fileID: 0}
 --- !u!54 &2310076296287862802
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -3,14 +3,15 @@ using UnityEngine.Events;
 
 public class TrouController : MonoBehaviour
 {
-    [SerializeField]
-    private UnityEvent trouAtteint;
+    private UnityEvent trouAtteint = new UnityEvent();
 
     private void OnTriggerEnter(Collider other)
     {
         var balle = other.GetComponent<BalleController>();
         if (balle != null)
         {
+            trouAtteint.RemoveAllListeners();
+            trouAtteint.AddListener(balle.ResetPartie);
             trouAtteint.Invoke();
         }
     }
