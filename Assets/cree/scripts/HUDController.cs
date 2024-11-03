@@ -12,6 +12,8 @@ public class HUDController : MonoBehaviour
     [SerializeField]
     private GameObject pauseHUD;
     [SerializeField]
+    private GameObject tutoHUD;
+    [SerializeField]
     private TextMeshProUGUI nbCoupsRestant;
     [SerializeField]
     public Slider volumeSlider;
@@ -63,6 +65,16 @@ public class HUDController : MonoBehaviour
     {
         menuSoundEffect.Play();
         menuAnimator.SetTrigger("onMenuTrig");
+    }
+
+    public void ActiverTuto()
+    {
+        tutoHUD.SetActive(true);
+    }
+
+    public void DesactiverTuto()
+    {
+        tutoHUD.SetActive(false);
     }
 
     /// <summary>
