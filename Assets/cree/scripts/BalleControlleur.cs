@@ -11,41 +11,47 @@ using UnityEngine.UI;
 public class BalleController : MonoBehaviour
 {
 
+    //variables qui gère la rotation de la balle
     [SerializeField]
     private float vitesseRotation;
     private float rotation;
 
-    private Vector2 deplacement;
-
+    //variable pour le rigidbody de la balle, est assigné dans le start
     private Rigidbody balleRB;
 
+    //variable pour géré la force de pousse dans l'inspecteur
     [SerializeField]
     private float forcePousse;
 
-    private Vector3 directionInitiale;
-
-    [SerializeField]
-    private GameObject fleche;
-
+    //varibale qui stock la jauge de puissance
     [SerializeField]
     public Slider jauge;
 
+    //variable qui gère la rapidité de la jauge
     [SerializeField]
     private float rapiditeJauge;
+    //variable qui détermine si il y a un coup actif ou non
     private bool coupActif;
+    //variable qui détermince si la jauge va vers le haut ou le bas
     private bool jaugeMonte;
 
+    //coroutine qui gère la jauge de puissance
     private Coroutine jaugeCoroutine;
 
+    //variable qui stock le nombre de coup restant 
     [SerializeField]
     private float coups;
 
+    //unityevent qui appel le HUD pour afficher le nombre de point restant
     [SerializeField]
     private UnityEvent<float> afficherPoint;
 
+    //variable public get qui indique la longeur du parcour actuel
     public static int longueurMap { private set; get; }
-
+    //variable qui indique le actuel
     private float currentTrou;
+
+    //des TextMesh qui contiennent les éléments du HUD qui afficher les score des 4 premiers troues
     [SerializeField]
     private TextMeshProUGUI trou1C;
     [SerializeField]
@@ -54,7 +60,12 @@ public class BalleController : MonoBehaviour
     private TextMeshProUGUI trou3C;
     [SerializeField]
     private TextMeshProUGUI trou4C;
+    [SerializeField]
+    private TextMeshProUGUI trou5C;
+    [SerializeField]
+    private TextMeshProUGUI trou6C;
 
+    //variable qui détermine si la balle a ateint le troue ou non, signifiant la fin du parcour actuel
     private bool mapFini = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -62,11 +73,15 @@ public class BalleController : MonoBehaviour
     {
         afficherPoint.Invoke(coups);
         balleRB = gameObject.GetComponent<Rigidbody>();
-        directionInitiale = transform.forward;
         longueurMap = 5;
         currentTrou = 0;
     }
 
+    /// <summary>
+    /// fonction qui sert à compter le nombre de coup joué par parcour par le joueur.
+    /// si le compte atteint 0, le joueur passe au prochain parcour mais un score de 0.
+    /// unityevent qui invoke la fonction AfficherCoupsRestant(float coups) de HUDController
+    /// </summary>
     private void CoupJouer()
     {
         if(coups > 0) 
@@ -81,31 +96,48 @@ public class BalleController : MonoBehaviour
         afficherPoint.Invoke(coups);
     }
 
+    /// <summary>
+    /// fonction qui sert à passer au prochain troue, donc génère une map plus longue et reset le compte de coup
+    /// </summary>
     public void ResetPartie() //je ne fait pas le respawn de la balle ici car unity se fache pis je suis tanné de chercher
     {
         currentTrou++;
         mapFini = true;
-        coups = 20;
         longueurMap++;
         gameObject.transform.position = new Vector3(0, 1, -1);
     }
 
+    /// <summary>
+    /// fonction sert à reset le position de la balle à 0 dans le même parcour. est appelé quand le joueur tombe hors du parcour.
+    /// </summary>
     public void Respawn()
     {
         gameObject.transform.position = new Vector3(0, 1, -1);
     }
-
-    //code emprunté à Alex le prof (je crois, à vérifier. dans le doute, je dit que c'est emprunté)
+    /// <summary>
+    /// code emprunté à Alex le prof (je crois, à vérifier. dans le doute, je dit que c'est emprunté)
+    /// après vérification, c'est effectivement du code dans le jeu de dino
+    /// fonction qui sert à rotationer la balle selon les input du joueur
+    /// </summary>
+    /// <param name="contexte"></param>
     public void Rotater(InputAction.CallbackContext contexte)
     {
         rotation = contexte.action.ReadValue<float>();
     }
 
+
+    /// <summary>
+    /// fonction qui sert à frapper la balle. le joueur appuie un première fois sur SPACE.
+    /// le script "commence un coup" et appel la coroutine AjusterJaugeForce. 
+    /// La jauge de puissance monte et descend jusqu'à ce que le joueur réappuie sur SPACE et met "fin au coup"
+    /// quand le coup est fini, la fonction arrête la coroutine pour récupé la puissance de la jauge pour envoyer la force dans le rigidbody de la balle.
+    /// la fonction appel ensuite CoupJouer() pour  mettre à jour le nombre de coup restant
+    /// </summary>
+    /// <param name="contexte"></param>
     public void Pousser(InputAction.CallbackContext contexte) 
     {
         if (contexte.performed)
         {
-            //balleRB.AddForce(forcePousse * transform.forward, ForceMode.Impulse);
             if(!coupActif)
             {
                 jaugeCoroutine = StartCoroutine(AjusterJaugeForce());
@@ -121,6 +153,13 @@ public class BalleController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// coroutine de jauge de puissance
+    /// utilise un while(true) parce que j'aime le danger (c'est juste que je veux que ça boucle à l'infini tant que le joueur à pas appuyé sur SPACE)
+    /// le yield return empêche le while(true) de crash vue que ça attend la prochaine frame pis la coroutine arrête quand le joueur réappuie sur SPACE
+    /// la boucle change la value de la jauge pour que le joueur aille un feedback visuel du choix de la force, et change aussi la valeur de la puissance elle-même
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator AjusterJaugeForce()
     {
         jaugeMonte = true;
@@ -150,28 +189,14 @@ public class BalleController : MonoBehaviour
         }
     }
 
-
-    /// <summary>
-    /// PLUS UTILISÉ CAR FUCKIN INUTILE (I'M DUMB) À VOIR SI À GARDER OU ENLEVER
-    /// </summary>
-    /// <param name="collision"></param>
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Mur"))
-        {
-            // Forcer la direction apres la collision
-            directionInitiale = Vector3.Reflect(balleRB.linearVelocity.normalized, collision.contacts[0].normal);
-            balleRB.linearVelocity = directionInitiale * balleRB.linearVelocity.magnitude;
-        }
-    }
-
     void FixedUpdate()
     {
         // Rotation autour de l'axe des Y
-        ////code emprunté à Alex le prof (je crois, à vérifier. dans le doute, je dit que c'est emprunté)
+        ////code emprunté à Alex le prof (je crois, à vérifier. dans le doute, je dit que c'est emprunté) c'est emprunté
         balleRB.rotation = balleRB.rotation *
             Quaternion.AngleAxis(rotation * vitesseRotation * Time.deltaTime, Vector3.up);
 
+        //case qui détermine dans quel parcour le joueur est, vue que les 4 premiers trou sont comptabilisés
         if (mapFini)
         {
             switch (currentTrou)
@@ -190,7 +215,15 @@ public class BalleController : MonoBehaviour
                 case 4:
                     trou4C.SetText(coups.ToString());
                     break;
+                case 5:
+                    trou5C.SetText(coups.ToString());
+                    break;
+                case 6:
+                    trou6C.SetText(coups.ToString());
+                    break;
             }
+            coups = 30;
+            afficherPoint.Invoke(coups);
             mapFini = false;
         }
     }
