@@ -64,6 +64,14 @@ public class BalleController : MonoBehaviour
     private TextMeshProUGUI trou5C;
     [SerializeField]
     private TextMeshProUGUI trou6C;
+    //affiche le score final
+    [SerializeField]
+    private TextMeshProUGUI scoreFinal;
+    //stock le score final en attendant de le mettre dans scoreFinal
+    private float scoreFinalCoups;
+    //gameobject qui contient l'écran de fin
+    [SerializeField]
+    private GameObject ecranFin;
 
     //variable qui détermine si la balle a ateint le troue ou non, signifiant la fin du parcour actuel
     private bool mapFini = false;
@@ -205,21 +213,29 @@ public class BalleController : MonoBehaviour
                     break;
                 case 1:
                     trou1C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
                     break;
                 case 2:
                     trou2C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
                     break;
                 case 3:
                     trou3C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
                     break;
                 case 4:
                     trou4C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
                     break;
                 case 5:
                     trou5C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
                     break;
                 case 6:
                     trou6C.SetText(coups.ToString());
+                    scoreFinalCoups += (30 - coups);
+                    ecranFin.SetActive(true);
+                    scoreFinal.SetText(scoreFinalCoups.ToString());
                     break;
             }
             coups = 30;

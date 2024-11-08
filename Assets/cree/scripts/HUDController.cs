@@ -25,6 +25,9 @@ public class HUDController : MonoBehaviour
     //audiosource qui contient la musique
     [SerializeField]
     private AudioSource musique;
+    //gameobject qui contient l'écran de fin
+    [SerializeField]
+    private GameObject ecranFin;
 
     //Animator qui contient l'animator controller "MenuController"
     private Animator menuAnimator;
@@ -39,6 +42,14 @@ public class HUDController : MonoBehaviour
         //inGameHUD.SetActive(true);
         //pauseHUD.SetActive(false);
         menuAnimator = gameObject.GetComponent<Animator>();
+    }
+
+    /// <summary>
+    /// fermer l'écran de fin
+    /// </summary>
+    public void FermerEcranFin()
+    {
+        ecranFin.SetActive(false);
     }
 
     /// <summary>
